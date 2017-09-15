@@ -1,0 +1,6 @@
+[Unit]
+Description = Arch Auto Update Service
+
+[Service]
+Type=oneshot
+ExecStart=/home/pogoplug/autoupdate/autoupdate.sh

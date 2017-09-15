@@ -1,0 +1,105 @@
+## Arch Install for PogoPlug - Media Applications
+
+#####################
+# Plex Media Server #
+#####################
+## Install Plex Media Server
+	pacman -Syu plex-media-server
+
+## Create folders for application data
+	mkdir /home/pogoplug/applications/plexmediaserver
+	nano /etc/conf.d/plexmediaserver
+		PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR=/home/pogoplug/applications/plexmediaserver
+
+## Move override.conf to /etc/systemd/system/plexmediaserver.service.d/override.conf
+
+## Enable & Start Plex Media Server
+	systemctl enable plexmediaserver
+	systemctl start plexmediaserver
+
+## Firewall Exception
+	ufw allow to any port 32400 proto tcp
+	ufw allow to any port 1900
+	ufw allow to any port 1901
+
+## Plex can now be set up at http://ip:32400/web
+
+#####################
+# Mono installation #
+#####################
+
+## The latest version of Mono gives a SSL error, so we need to install a previous version and block pacman from installing updates
+
+## Install correct version
+	wget http://tardis.tiny-vps.com/aarm/packages/m/mono/mono-4.2.2.30-2-arm.pkg.tar.xz
+	pacman -U mono-4.2.2.30-2-arm.pkg.tar.xz
+
+## Blacklist future updates
+	nano /etc/pacman.conf
+		IgnorePkg=mono
+
+##########
+# Deluge #
+##########
+
+## Install Deluge package
+	pacman -Syu deluge python2-service-identity python2-mako
+
+## Move override.conf to /etc/systemd/system/deluged.service.d & /etc/systemd/system/deluge-web.service.d
+
+## Enable & start systemd service
+	systemctl enable deluged.service
+	systemctl enable deluge-web.service
+
+	systemctl start deluged.service
+	systemctl start deluge-web.service
+
+## Go to the default port (8112) & start configuration
+
+## After initial startup, you can change the port in the config file
+	nano /home/pogoplug/.config/deluge/web.conf
+		port: 8080
+
+# Install AutoRemovePlus plugin, download from https://github.com/omaralvarez/deluge-autoremoveplus/releases
+	# Upload the python egg file to the deluge web interface (settings -> plugins)  
+
+##########
+# Sonarr #
+##########
+
+## Install extra packages
+	pacman -Syu libmms libmediainfo
+
+## Download latest release from http://download.sonarr.tv/v2/master/mono/
+
+## Create folders
+	mkdir /home/pogoplug/applications/sonarr/app/
+	mkdir /home/pogoplug/applications/sonarr/data/
+
+## Move sonarr.service to /etc/systemd/system/
+	systemctl enable sonarr
+	systemctl start sonarr
+
+## Firewall exception
+	ufw allow to any port 8989
+
+## Sonarr is now available at http://<IP>:8989/
+
+##########
+# Radarr #
+##########
+
+## Download latest release from https://github.com/Radarr/Radarr/releases
+
+## Create folders
+	mkdir /home/pogoplug/applications/radarr/app/
+	mkdir /home/pogoplug/applications/radarr/data/
+
+## Move sonarr.service to /etc/systemd/system/
+	systemctl enable radarr
+	systemctl start radarr
+
+## Firewall exception
+	ufw allow to any port 7878
+
+## Sonarr is now available at http://<IP>:7878/

@@ -1,0 +1,9 @@
+[Unit]
+Description = DuckDns IP Address update
+Wants=network-online.target
+After=network-online.target
+OnFailure=unit-failure-notification@%n
+
+[Service]
+Type=oneshot
+ExecStart=/home/pogoplug/applications/duckdns/duckdns.sh

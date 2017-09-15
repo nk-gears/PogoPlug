@@ -1,0 +1,16 @@
+[Unit]
+Description = Will run duckdns.service every day at midnight
+Wants=network-online.target
+After=network-online.target
+
+[Timer]
+# OnCalendar Syntax: days year-month-day hour:minutes:seconds
+# 1..5 represents a range
+# * is wildcard
+# days works as an if statemtent (only run if day is equal to one of the options in days) (Optional)
+
+OnCalendar= *-*-* 00:00:00
+Unit=duckdns.service
+
+[Install]
+WantedBy=multi-user.target

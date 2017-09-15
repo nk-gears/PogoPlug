@@ -1,0 +1,163 @@
+## Arch Install for PogoPlug
+
+# 1) Follow the instructions to get an install of Arch Linux ARM going on PogoPlug at https://archlinuxarm.org/platforms/armv5/pogoplug-v2-pinkgray
+		## Set up a SWAP partition on the HDD that you are going to have on this PogoPlug if possible
+
+# Boot up in Arch Linux ARM after installation on the Pogoplug and get IP that was assigned to the PogoPlug through router or ping. Afterwards, SSH into PogoPlug, sign in with root first
+
+###########
+# General #
+###########
+
+## Set correct permissions on root folder
+	chown root:root /
+
+## Set different hostname
+	hostnamectl set-hostname PogoPlug
+
+## Set timezone
+	timedatectl set-timezone Europe/Brussels
+
+## Create different user
+	useradd -m -G wheel -s /bin/bash pogoplug
+	passwd -l pogoplug
+
+## Updates & installation of basic packages
+	pacman -Syu linux-kirkwood linux-kirkwood-headers ntp base-devel nano wget rsync git unzip
+
+## Enable NTP for time synchronization
+	systemctl enable ntpd
+	systemctl start ntpd
+
+## Generate new SSH keys
+	rm /etc/ssh/ssh_host*
+	ssh-keygen -A
+
+## Change locale
+	nano /etc/locale.gen
+		# Uncomment en_US.UTF-8 UTF-8
+
+	locale-gen
+
+	nano /etc/locale.conf
+		LANG=en_US.UTF-8
+
+## Set up SWAP partition
+	# Identify SWAP partition that you made earlier on the USB drive, probably /dev/sda2
+	mkswap /dev/sda2
+	swapon /dev/sda2
+
+	# Get UUID of swap partition
+	blkid /dev/sda2
+
+	# Set SWAP on boot
+	nano /etc/fstab
+		UUID=<SWAP UUID HERE> none swap defaults 0 0
+
+## Set up sudo
+	EDITOR=nano visudo
+		pogoplug ALL=(ALL) ALL
+
+## Set up folders
+	mkdir /home/pogoplug/Movies
+	mkdir /home/pogoplug/TVShows
+	mkdir /home/pogoplug/Downloads
+	mkdir /home/pogoplug/Downloads/incomplete
+	mkdir /home/pogoplug/Downloads/complete
+	mkdir /home/pogoplug/Downloads/complete/movies
+	mkdir /home/pogoplug/Downloads/complete/tvshows
+
+####################
+# Set up Static IP #
+####################
+
+## Networking is done through systemd-networkd
+	nano /etc/systemd/network/eth0.service
+	
+		[Match]
+		Name=eth0
+
+		[Network]
+		Address=192.168.0.11/24
+		Gateway=192.168.0.1
+
+
+
+############
+# Security #
+############
+
+## Restrict root login
+	passwd -l root
+
+## Restrict SSH
+	nano /etc/ssh/sshd_config
+		PermitRootLogin no
+
+## Restricting access to kernel logs
+nano /etc/sysctl.d/50-dmesg-restrict.conf
+	kernel.dmesg_restrict = 1
+
+## Restricting access to kernel pointers in the proc filesystem
+nano /etc/sysctl.d/50-kptr-restrict.conf
+	kernel.kptr_restrict = 1
+
+## Firewall
+	pacman -Syu ufw
+	ufw default deny
+	ufw allow to any port 22 proto tcp
+	ufw enable
+
+	systemctl enable ufw
+	systemctl start ufw
+
+################
+# Samba Server #
+################
+## Install Samba
+	pacman -Syu samba
+
+## Move smb.conf to /etc/samba/
+
+## Create SMB password
+	smbpasswd -a pogoplug
+
+## Start samba
+	systemctl enable smbd nbmd
+	systemctl start smbd nbmd
+
+############################
+# Mount SMB server at boot #
+############################
+# First, test out mounts with sudo mount -t cifs //<IPADDRESS>/<FOLDER> TVShows/ -o user=<USERNAME>,password=<PASSWORD>
+
+nano /etc/fstab
+	//SERVER/sharename /mnt/mountpoint cifs username=myuser,password=mypass 0 0
+
+##############
+# Autoupdate #
+##############
+
+## Move autoupdate.sh to /home/pogoplug/applications/autoupdate
+
+## Move autoupdate.service & autoupdate.timer to /etc/systemd/system/
+	systemctl enable autoupdate.timer
+	systemctl start autoupdate.timer
+
+###########
+# DuckDNS #
+###########
+
+## Move duckdns.sh to /home/pogoplug/applications/duckdns/
+
+## Move duckdns.service & duckdns.timer to /etc/systemd/system/
+	systemctl enable duckdns.timer
+	systemctl start duckdns.timer
+
+#########################
+# Failure Notifications #
+#########################
+
+## Move failure-notification.sh to /home/pogoplug/applications/
+
+## Move unit-failure-notification@.service to /etc/systemd/system/

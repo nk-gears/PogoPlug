@@ -1,0 +1,7 @@
+[Unit]
+Description = Unit Failure Notification Service
+After = network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/pogoplug/applications/failure-notification.sh %I

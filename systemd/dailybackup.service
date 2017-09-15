@@ -1,0 +1,7 @@
+[Unit]
+Description = Daily Backup Script
+OnFailure=unit-failure-notification@%n
+
+[Service]
+Type=oneshot
+ExecStart=/home/pogoplug/applications/backup/dailybackup.sh
