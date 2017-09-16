@@ -5,9 +5,6 @@ After=network-online.target
 OnFailure=unit-failure-notification@%n
 
 [Service]
-# Mono 5.0 fix (https://github.com/Radarr/Radarr/issues/1528)
-Environment=MONO_TLS_PROVIDER=legacy
-
 User=pogoplug
 Group=pogoplug
 ExecStart=/usr/bin/mono /home/pogoplug/applications/sonarr/app/NzbDrone.exe --nobrowser --debug -data=/home/pogoplug/applications/sonarr/data/

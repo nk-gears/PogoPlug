@@ -1,6 +1,6 @@
 #!/bin/bash
 
-API=o.xYd9Q85uxflrzlSXukayL0XFiYfSfdqf
+API=<API>
 TITLE="$1"
 MSG="$2"
 

@@ -131,8 +131,8 @@ nano /etc/sysctl.d/50-kptr-restrict.conf
 ############################
 # First, test out mounts with sudo mount -t cifs //<IPADDRESS>/<FOLDER> TVShows/ -o user=<USERNAME>,password=<PASSWORD>
 
-nano /etc/fstab
-	//SERVER/sharename /mnt/mountpoint cifs username=myuser,password=mypass 0 0
+# Change /etc/fstab for permanent mounting
+	nano /etc/fstab
 
 ##############
 # Autoupdate #

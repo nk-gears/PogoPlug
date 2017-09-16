@@ -1,0 +1,12 @@
+#
+# /etc/fstab: static file system information
+#
+# <file system> <dir>   <type>  <options>       <dump>  <pass>
+# SWAP Partition
+UUID=539635a3-81c4-4254-b070-82072fac0011 none swap defaults 0 0
+
+# SMB Movies
+//192.168.0.171/Movies /home/pogoplug/Movies cifs username=<USERNAME>,password=<PASSWORD>,x-systemd.automount,x-systemd.device-timeout=30,nofail,uid=1001,gid=1001,forceuid,forcegid 0 0
+
+# SMB TVShows
+//192.168.0.171/TVShows /home/pogoplug/TVShows cifs username=<USERNAME>,password=<PASSWORD>,x-systemd.automount,x-systemd.device-timeout=30,nofail,uid=1001,gid=1001,forceuid,forcegid 0 0
